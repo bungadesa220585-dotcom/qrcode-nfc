@@ -1,0 +1,7 @@
+{
+  "name": "LinkTag — Dynamic QR, NFC & Barcode Manager",
+  "description": "Create, manage, and dynamically redirect QR Codes, NFC Tags, and Barcodes from a unified enterprise dashboard with live analytics and Android NFC Writer companion.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
+

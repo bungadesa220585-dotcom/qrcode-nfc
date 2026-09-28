@@ -1,0 +1,52 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // User profiles
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow write: if isOwner(userId);
+    }
+
+    // Projects
+    match /projects/{projectId} {
+      allow read: if isAuthenticated() && (resource == null || resource.data.userId == request.auth.uid);
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // Dynamic Codes (QR, NFC, Barcode)
+    match /codes/{codeId} {
+      // Public read allowed for redirect lookup without authentication
+      allow read: if true;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      // Allow atomic scanCount increment from redirect engine
+      allow update: if request.resource.data.diff(resource.data).affectedKeys().hasOnly(['scanCount', 'updatedAt']);
+    }
+
+    // NFC Writes Log
+    match /nfc_writes/{writeId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // Scans & Analytics
+    match /scans/{scanId} {
+      // Anyone can log a scan event (via redirect engine)
+      allow create: if true;
+      // Scans can be read by authenticated users
+      allow read: if isAuthenticated();
+      allow update, delete: if isAuthenticated();
+    }
+  }
+}

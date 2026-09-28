@@ -1,0 +1,118 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "User profile for LinkTag platform account",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "email": { "type": "string", "format": "email" },
+        "name": { "type": "string" },
+        "avatarUrl": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "email", "name"]
+    },
+    "Project": {
+      "title": "Project",
+      "description": "Organizational container for group of QR, NFC, and Barcodes",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "color": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "name"]
+    },
+    "Code": {
+      "title": "Code",
+      "description": "Master table for Dynamic QR, NFC, and Barcodes",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "userId": { "type": "string" },
+        "projectId": { "type": "string" },
+        "uniqueId": { "type": "string" },
+        "codeType": { "type": "string", "enum": ["qr", "nfc", "barcode"] },
+        "subType": { "type": "string" },
+        "name": { "type": "string" },
+        "destinationUrl": { "type": "string" },
+        "rawContent": { "type": "string" },
+        "barcodeFormat": { "type": "string" },
+        "isDynamic": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["active", "disabled", "expired"] },
+        "scanCount": { "type": "number" },
+        "expiresAt": { "type": "string" },
+        "customization": { "type": "string" },
+        "schedules": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "updatedAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "userId", "uniqueId", "codeType", "name", "destinationUrl", "status"]
+    },
+    "NfcWrite": {
+      "title": "NfcWrite",
+      "description": "Log of NFC tag physical write operations and verification",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "codeId": { "type": "string" },
+        "userId": { "type": "string" },
+        "deviceInfo": { "type": "string" },
+        "writeStatus": { "type": "string", "enum": ["success", "failed", "pending"] },
+        "verificationStatus": { "type": "string", "enum": ["verified", "unverified", "mismatch"] },
+        "writtenPayload": { "type": "string" },
+        "verifiedPayload": { "type": "string" },
+        "writtenAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "codeId", "userId", "writeStatus"]
+    },
+    "Scan": {
+      "title": "Scan",
+      "description": "Analytics record logged upon redirect engine hit",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "codeId": { "type": "string" },
+        "uniqueId": { "type": "string" },
+        "codeType": { "type": "string" },
+        "eventTime": { "type": "string", "format": "date-time" },
+        "userAgent": { "type": "string" },
+        "deviceType": { "type": "string" },
+        "browser": { "type": "string" },
+        "os": { "type": "string" },
+        "country": { "type": "string" },
+        "city": { "type": "string" },
+        "ipHash": { "type": "string" },
+        "referrer": { "type": "string" }
+      },
+      "required": ["id", "codeId", "uniqueId", "codeType", "eventTime"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/User" },
+      "description": "User profile collection"
+    },
+    "/projects/{projectId}": {
+      "schema": { "$ref": "#/entities/Project" },
+      "description": "User projects collection"
+    },
+    "/codes/{codeId}": {
+      "schema": { "$ref": "#/entities/Code" },
+      "description": "Dynamic codes collection"
+    },
+    "/nfc_writes/{writeId}": {
+      "schema": { "$ref": "#/entities/NfcWrite" },
+      "description": "NFC writing audit trail collection"
+    },
+    "/scans/{scanId}": {
+      "schema": { "$ref": "#/entities/Scan" },
+      "description": "Scan event logs collection"
+    }
+  }
+}
